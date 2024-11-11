@@ -13,8 +13,11 @@ int main() {
     for (int i = 0; i < no_of_lines; i++) {
         cin >> from;
         cin >> to;
-        pageGraph.insertEdge(stoi(from), stoi(to));
+        pageGraph.insertEdge(from, to);
     }
+
+    // pageGraph.printAdjList();
+    // pageGraph.printOutDegrees();
 
     string output = pageGraph.pageRankAlgo(power_iterations);
 

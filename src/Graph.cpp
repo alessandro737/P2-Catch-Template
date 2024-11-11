@@ -11,20 +11,41 @@ string Graph::pageRankAlgo(int n){
     map<int, double> ranks;
     initializeRanks(ranks);
 
-    for(int i = 0; i < n; i++) {
+    for(int i = 0; i < n - 1; i++) {
         map<int, double> newRanks;
 
-        for(const auto &[page, rank] : ranks) {
+        // calculate contribution for pages
+        for(const auto &pair : ranks) {
+            int page = pair.first;
+            double rank = pair.second;
             double contribution = rank / getOutDegree(page);
+
             for (int neighbor : getAdjacent(page)) {
                 newRanks[neighbor] += contribution;
             }
         }
-        ranks = newRanks;
+        //update ranks for next power iteration
+        ranks = move(newRanks);
+
+        // cout << "Iteration " << i + 1 << " ranks:\n";
+        // for (const auto &pair : ranks) {
+        //     cout << idToURL[pair.first] << ": " << pair.second << "\n";
+        // }
     }
 
+    double totalRank = 0.0;
+    for(const auto &pair : ranks) {
+        totalRank += pair.second;
+    }
+    for(auto &pair : ranks) {
+        pair.second /= totalRank;
+    }
+
+    // Output PageRank Vals in Alpha order of URLs
     ostringstream oss;
-    for(const auto &[url, id] : urlToId) {
+    for(const auto &pair : urlToId) {
+        const string &url = pair.first;
+        int id = pair.second;
         oss << url << " " << fixed << setprecision(2) << ranks[id] << "\n";
     }
 
@@ -41,9 +62,9 @@ int Graph::getOrCreateId(const string &url) {
     return urlToId[url];
 }
 
-void Graph::insertEdge(int from, int to) {
-    int fromId = getOrCreateId(idToURL[from]);
-    int toId = getOrCreateId(idToURL[to]);
+void Graph::insertEdge(const string& from, const string& to) {
+    int fromId = getOrCreateId(from);
+    int toId = getOrCreateId(to);
     adjList[fromId].push_back(toId);
     outDegree[fromId]++;
 }
@@ -65,9 +86,44 @@ vector<int> Graph::getVertices() const {
 }
 
 void Graph::initializeRanks(map<int, double> &ranks) const {
-    double initialRank = 1.0 / adjList.size();
-    for (const auto& vertex : adjList) {
-        ranks[vertex.first] = initialRank;
+    double initialRank = 1.0 / urlToId.size();
+    // cout << "Initial Rank: " << initialRank << endl;
+    for (const auto& vertex : urlToId) {
+        ranks[vertex.second] = initialRank;
     }
+}
+
+void Graph::printAdjList() const {
+    cout << "Adjacency List:" << endl;
+    for (const auto &pair : adjList) {
+        int pageId = pair.first;
+        cout << idToURL.at(pageId) << " -> ";
+        for (int neighbor : pair.second) {
+            cout << idToURL.at(neighbor) << " ";
+        }
+        cout << endl;
+    }
+}
+
+void Graph::printOutDegrees() const {
+    cout << "Out-Degrees:" << endl;
+    for (const auto &pair : outDegree) {
+        int pageId = pair.first;
+        cout << idToURL.at(pageId) << " : " << pair.second << endl;
+    }
+}
+
+int Graph::parseInput(const string &input) {
+    istringstream iss(input);
+    int no_of_lines, power_iterations;
+    iss >> no_of_lines >> power_iterations;
+
+    string from, to;
+    for(int i = 0; i < no_of_lines; i++) {
+        iss >> from >> to;
+        insertEdge(from, to);
+    }
+
+    return power_iterations;
 }
 
