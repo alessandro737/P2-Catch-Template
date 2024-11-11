@@ -19,30 +19,27 @@ string Graph::pageRankAlgo(int n){
         for(const auto &pair : ranks) {
             int page = pair.first;
             double rank = pair.second;
-            double contribution = rank / getOutDegree(page);
+            int outLinks = getOutDegree(page);
 
-            for (int neighbor : getAdjacent(page)) {
-                newRanks[neighbor] += contribution;
+            if(outLinks > 0) {
+                double contribution = rank / outLinks;
+                for (int neighbor: getAdjacent(page)) {
+                    newRanks[neighbor] += contribution;
+                }
             }
         }
+
         //update ranks for next power iteration
         ranks = std::move(newRanks);
 
         // Debuggin Purposes
-        // cout << "Iteration " << i + 1 << " ranks:\n";
-        // for (const auto &pair : ranks) {
-        //     cout << idToURL[pair.first] << ": " << pair.second << "\n";
-        // }
+
+//         cout << "Iteration " << i + 1 << " ranks:\n";
+//         for (const auto &pair : ranks) {
+//             cout << idToURL[pair.first] << ": " << pair.second << "\n";
+//         }
     }
 
-    // Normalizing ranks to ensure they all add up to one
-    double totalRank = 0.0;
-    for(const auto &pair : ranks) {
-        totalRank += pair.second;
-    }
-    for(auto &pair : ranks) {
-        pair.second /= totalRank;
-    }
 
     // Output PageRank Vals in Alpha order of URLs
     ostringstream oss;
@@ -85,7 +82,7 @@ int Graph::getOutDegree(int vertex) const {
 
 void Graph::initializeRanks(map<int, double> &ranks) const {
     double initialRank = 1.0 / urlToId.size();
-    // cout << "Initial Rank: " << initialRank << endl;
+//    cout << "Initial Rank: " << initialRank << endl;
     for (const auto& vertex : urlToId) {
         ranks[vertex.second] = initialRank;
     }

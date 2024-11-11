@@ -18,8 +18,8 @@ int main() {
     }
 
     //Debug Purposes
-    // pageGraph.printAdjList();
-    // pageGraph.printOutDegrees();
+//     pageGraph.printAdjList();
+//     pageGraph.printOutDegrees();
 
     string output = pageGraph.pageRankAlgo(power_iterations);
 
