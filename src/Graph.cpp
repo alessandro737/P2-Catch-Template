@@ -1,4 +1,5 @@
 #include "Graph.h"
+
 #include <iostream>
 #include <sstream>
 
@@ -25,14 +26,16 @@ string Graph::pageRankAlgo(int n){
             }
         }
         //update ranks for next power iteration
-        ranks = move(newRanks);
+        ranks = std::move(newRanks);
 
+        // Debuggin Purposes
         // cout << "Iteration " << i + 1 << " ranks:\n";
         // for (const auto &pair : ranks) {
         //     cout << idToURL[pair.first] << ": " << pair.second << "\n";
         // }
     }
 
+    // Normalizing ranks to ensure they all add up to one
     double totalRank = 0.0;
     for(const auto &pair : ranks) {
         totalRank += pair.second;
@@ -70,19 +73,14 @@ void Graph::insertEdge(const string& from, const string& to) {
 }
 
 const vector<int>& Graph::getAdjacent(int vertex) const {
-    return adjList.at(vertex);
+    static const vector<int> empty;
+    auto it = adjList.find(vertex);
+    return it != adjList.end() ? it->second : empty;
 }
 
 int Graph::getOutDegree(int vertex) const {
+    //If outDegree does not exist return 0
     return outDegree.count(vertex) ? outDegree.at(vertex) : 0;
-}
-
-vector<int> Graph::getVertices() const {
-    vector<int> result;
-    for (const auto& vertex : adjList) {
-        result.push_back(vertex.first);
-    }
-    return result;
 }
 
 void Graph::initializeRanks(map<int, double> &ranks) const {

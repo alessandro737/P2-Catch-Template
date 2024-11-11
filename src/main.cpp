@@ -1,5 +1,6 @@
-#include <iostream>
 #include "Graph.h"
+
+#include <iostream>
 
 using namespace std;
 
@@ -16,6 +17,7 @@ int main() {
         pageGraph.insertEdge(from, to);
     }
 
+    //Debug Purposes
     // pageGraph.printAdjList();
     // pageGraph.printOutDegrees();
 
